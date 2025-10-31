@@ -1,0 +1,22 @@
+{
+  "name": "cf_ai_task_assistant",
+  "version": "1.0.0",
+  "description": "AI-powered task assistant built on Cloudflare",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "pages:dev": "wrangler pages dev public",
+    "pages:deploy": "wrangler pages deploy public"
+  },
+  "keywords": [
+    "cloudflare",
+    "ai",
+    "workers"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.80.0"
+  }
+}
