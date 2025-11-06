@@ -713,7 +713,6 @@ MIT License - feel free to use this as a starting point for your own projects!
 
 - **Total Lines of Code**: ~580 (excluding documentation)
 - **Documentation Lines**: ~2,300+
-- **Development Time**: ~3 hours (with AI assistance)
 - **Dependencies**: Minimal (agents, wrangler)
 - **Technologies Used**: 6 (Workers, AI, Agents, DO, Pages, Wrangler)
 
