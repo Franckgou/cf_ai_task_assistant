@@ -318,7 +318,7 @@ This ensures we always get the *next* occurrence of that day."
 
 ---
 
-## 🔮 Future Enhancements (Not Implemented Yet)
+## 🔮 Future Enhancements (Not Implemented Yet but in dev)
 
 ### Would Add With More Time:
 

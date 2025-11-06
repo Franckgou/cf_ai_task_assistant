@@ -1,5 +1,4 @@
 // AI Task Assistant - Cloudflare Workers + Durable Objects
-// Requirements Met: LLM (Workers AI), Workflow (Durable Objects), Input (HTTP), Memory (DO Storage)
 
 // Natural Language Date Parser
 function parseNaturalDate(text) {
