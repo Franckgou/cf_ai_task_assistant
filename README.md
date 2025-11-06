@@ -693,10 +693,10 @@ MIT License - feel free to use this as a starting point for your own projects!
 
 **Your Name**
 
-- 📧 Email: your.email@example.com
-- 🐙 GitHub: [@yourusername](https://github.com/Franckgou)
-- 💼 LinkedIn: [Your Name](https://linkedin.com/in/franck-tayo)
-- 🌐 Portfolio: [your-portfolio.com](https://franckgou.netlify.app)
+- 📧 Email: tayofranck07@gmail.com
+- 🐙 GitHub: [@Franckgou](https://github.com/Franckgou)
+- 💼 LinkedIn: [Franck Tayo](https://linkedin.com/in/franck-tayo)
+- 🌐 Portfolio: [https://franckgou.netlify.app](https://franckgou.netlify.app)
 
 ---
 
