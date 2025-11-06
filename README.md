@@ -213,7 +213,7 @@ I built this as part of my application for the Cloudflare Software Engineering I
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/cf_ai_task_assistant.git
+git clone https://github.com/Franckgou/cf_ai_task_assistant.git
 cd cf_ai_task_assistant
 
 # 2. Install dependencies
