@@ -11,6 +11,7 @@
 ## 🔗 Quick Links
 
 - **🌐 Live Demo**: [cf-ai-task-assistant.pages.dev](https://cf-ai-task-assistant.pages.dev) *(Update with your deployed link)*
+- **🚀 Enhanced Features**: [ENHANCEMENTS.md](./ENHANCEMENTS.md) - **NEW!** Detailed breakdown of advanced features
 - **📚 Documentation**: [Full Project Docs](./README.md)
 - **💬 Try it locally**: `npm install && npm run dev`
 
@@ -45,14 +46,40 @@ I built this as part of my application for the Cloudflare Software Engineering I
 
 ## ✨ Key Features
 
+### ⚡ **Streaming AI Responses** (NEW!)
+- Real-time token-by-token AI responses
+- ChatGPT-style streaming experience
+- Significantly improved perceived performance
+- Toggle between streaming and traditional modes
+
+### 📅 **Natural Language Date Parsing** (NEW!)
+- Smart date extraction: "by Friday", "tomorrow", "in 3 days"
+- Automatic due date calculation
+- Visual due date indicators (Today, Tomorrow, Overdue!)
+- Context-aware date displays
+
+### 🔥 **Priority Detection** (NEW!)
+- Automatic priority assignment from keywords
+- Three levels: High, Medium, Normal
+- Visual priority badges
+- AI-aware of task urgency
+
+### 📊 **Task Analytics Dashboard** (NEW!)
+- Real-time completion metrics
+- Visual progress bar
+- Due soon tracking
+- Pending vs completed breakdown
+
 ### 🤖 **Natural Language Task Management**
 - Add tasks by simply saying: *"Add task: Buy groceries by Friday"*
 - Complete tasks: *"Mark task 1 as done"*
 - Query tasks: *"What do I need to do today?"*
 - Delete tasks: *"Remove task 2"*
 
-### 💬 **Conversational AI Assistant**
+### 💬 **Smart AI Assistant**
 - Context-aware responses using Llama 3.3 70B
+- Receives full task analytics in every request
+- Proactive suggestions based on task state
 - Maintains conversation history (last 50 messages)
 - Multi-turn conversations with memory
 - Answers questions beyond just task management

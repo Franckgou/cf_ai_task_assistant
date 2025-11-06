@@ -106,6 +106,104 @@
         text-transform: uppercase;
       }
 
+      .task-meta {
+        font-size: 11px;
+        color: #888;
+        margin-top: 5px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .task-due {
+        color: #ff6b6b;
+      }
+
+      .task-priority {
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+
+      .task-priority.high {
+        background: #ffebee;
+        color: #c62828;
+      }
+
+      .task-priority.medium {
+        background: #fff3e0;
+        color: #e65100;
+      }
+
+      .streaming-toggle {
+        text-align: center;
+        padding: 5px;
+        font-size: 12px;
+        color: #666;
+      }
+
+      .streaming-toggle label {
+        cursor: pointer;
+      }
+
+      .streaming-toggle input {
+        cursor: pointer;
+      }
+
+      .analytics {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .analytics h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 10px;
+        background: #f9f9f9;
+        border-radius: 6px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transition: width 0.3s ease;
+      }
+
       .messages {
         flex: 1;
         overflow-y: auto;
@@ -294,8 +392,15 @@
 
           <div class="examples">
             <strong>Try these commands:</strong>
-            "Add task: Buy groceries" • "Complete task 1" • "What are my tasks?"
-            • "Tell me a joke"
+            "Add task: Buy groceries by Friday" • "Add task: Urgent meeting tomorrow" •
+            "Complete task 1" • "What are my tasks?" • "Tell me a joke"
+          </div>
+
+          <div class="streaming-toggle">
+            <label>
+              <input type="checkbox" id="streamingToggle" checked />
+              Enable streaming responses (real-time AI)
+            </label>
           </div>
 
           <div class="input-area">
@@ -312,6 +417,31 @@
         </div>
 
         <div class="tasks-section">
+          <div id="analyticsSection" class="analytics" style="display: none;">
+            <h3>📊 Task Analytics</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value" id="totalTasks">0</div>
+                <div class="stat-label">Total Tasks</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Completed</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="pendingTasks">0</div>
+                <div class="stat-label">Pending</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="dueSoon">0</div>
+                <div class="stat-label">Due Soon</div>
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+          </div>
+
           <h2>📋 Your Tasks</h2>
           <div id="tasksList">
             <p style="color: #999; font-size: 14px">
@@ -333,8 +463,9 @@
       const sendBtn = document.getElementById("sendBtn");
       const tasksListDiv = document.getElementById("tasksList");
       const loadingDiv = document.getElementById("loading");
+      const streamingToggle = document.getElementById("streamingToggle");
 
-      // Send message function
+      // Send message function with streaming support
       async function sendMessage() {
         const message = messageInput.value.trim();
         if (!message) return;
@@ -343,6 +474,87 @@
         addMessage(message, "user");
         messageInput.value = "";
         sendBtn.disabled = true;
+
+        const useStreaming = streamingToggle.checked;
+
+        if (useStreaming) {
+          await sendMessageStreaming(message);
+        } else {
+          await sendMessageNormal(message);
+        }
+
+        sendBtn.disabled = false;
+        messageInput.focus();
+      }
+
+      // Streaming message handler
+      async function sendMessageStreaming(message) {
+        loadingDiv.classList.add("active");
+
+        try {
+          const response = await fetch(`${API_BASE}/api/chat/stream`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: message,
+              sessionId: sessionId,
+            }),
+          });
+
+          if (!response.ok) throw new Error("Failed to get response");
+
+          // Create assistant message element for streaming
+          const messageDiv = document.createElement("div");
+          messageDiv.className = "message assistant";
+          const contentDiv = document.createElement("div");
+          contentDiv.className = "message-content";
+          messageDiv.appendChild(contentDiv);
+          messagesDiv.appendChild(messageDiv);
+
+          loadingDiv.classList.remove("active");
+
+          // Read stream
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = JSON.parse(line.slice(6));
+
+                if (data.type === 'token') {
+                  contentDiv.textContent += data.content;
+                  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                } else if (data.type === 'tasks') {
+                  updateTasks(data.tasks);
+                } else if (data.type === 'error') {
+                  contentDiv.textContent = "Sorry, I encountered an error. Please try again.";
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          loadingDiv.classList.remove("active");
+          addMessage(
+            "Sorry, I encountered an error. Please try again. (Make sure your Worker is deployed!)",
+            "assistant"
+          );
+        }
+      }
+
+      // Normal (non-streaming) message handler
+      async function sendMessageNormal(message) {
         loadingDiv.classList.add("active");
 
         try {
@@ -376,8 +588,6 @@
           );
         } finally {
           loadingDiv.classList.remove("active");
-          sendBtn.disabled = false;
-          messageInput.focus();
         }
       }
 
@@ -400,18 +610,66 @@
         if (!tasks || tasks.length === 0) {
           tasksListDiv.innerHTML =
             '<p style="color: #999; font-size: 14px;">No tasks yet. Try saying "Add task: [your task]"</p>';
+          document.getElementById('analyticsSection').style.display = 'none';
           return;
         }
 
+        // Calculate analytics
+        const completed = tasks.filter(t => t.status === 'completed').length;
+        const pending = tasks.filter(t => t.status === 'pending').length;
+        const now = new Date();
+        const dueSoon = tasks.filter(t => {
+          if (!t.dueDate) return false;
+          const dueDate = new Date(t.dueDate);
+          const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 && diffDays <= 2 && t.status === 'pending';
+        }).length;
+
+        // Update analytics UI
+        document.getElementById('analyticsSection').style.display = 'block';
+        document.getElementById('totalTasks').textContent = tasks.length;
+        document.getElementById('completedTasks').textContent = completed;
+        document.getElementById('pendingTasks').textContent = pending;
+        document.getElementById('dueSoon').textContent = dueSoon;
+
+        const completionRate = tasks.length > 0 ? (completed / tasks.length * 100) : 0;
+        document.getElementById('progressFill').style.width = completionRate + '%';
+
+        // Update tasks list
         tasksListDiv.innerHTML = "";
         tasks.forEach((task, index) => {
           const taskDiv = document.createElement("div");
           taskDiv.className = `task-item ${
             task.status === "completed" ? "completed" : ""
           }`;
+
+          let metaHtml = '';
+          if (task.dueDate || task.priority) {
+            metaHtml = '<div class="task-meta">';
+
+            if (task.dueDate) {
+              const dueDate = new Date(task.dueDate);
+              const now = new Date();
+              const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+              let dueDateStr = dueDate.toLocaleDateString();
+              if (diffDays === 0) dueDateStr = 'Today';
+              else if (diffDays === 1) dueDateStr = 'Tomorrow';
+              else if (diffDays < 0) dueDateStr = 'Overdue!';
+
+              metaHtml += `<span class="task-due">📅 Due: ${dueDateStr}</span>`;
+            }
+
+            if (task.priority && task.priority !== 'normal') {
+              metaHtml += `<span class="task-priority ${task.priority}">⚡ ${task.priority.toUpperCase()}</span>`;
+            }
+
+            metaHtml += '</div>';
+          }
+
           taskDiv.innerHTML = `
                     <div class="task-title">${index + 1}. ${task.title}</div>
                     <div class="task-status">${task.status}</div>
+                    ${metaHtml}
                 `;
           tasksListDiv.appendChild(taskDiv);
         });
